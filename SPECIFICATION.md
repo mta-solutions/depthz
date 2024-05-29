@@ -16,7 +16,10 @@ everything into a singular output.
       "git@host:repoB.git",
       "git@host:repoC.git"
     ],
-    "services": ["Grafana", "Loki"]
+    "deps": [
+      { "name": "Grafana", "type": "service" },
+      { "name": "Loki", "type": "service" }
+    ]
   }
 }
 ```
@@ -28,23 +31,21 @@ Gets consumed by a process reading over an entry DEPTHZ and integrated into the 
 
 ```
 {
-  "servers": {
-    "name": "ServerA",  
-    "services": [
-      { "name": "AppA",
-        "dependencies": [
-          { "services": [
-            { "name": "PosgresA",
-              "dependencies": "DatabaseA"
-            }
-          },
-          "ExternalA",
-          "InternalA"
-        ],
-        "libraries": [{"name": "LibraryA", "version": "1.0"}]
-      }
-    ]
-  }
+  "deps": [
+    { "name": "ServerA", "type": "server" },  
+    { "name": "AppA",
+      "type": "service",
+      "deps": [
+        { "name": "PosgresA",
+          "type": "database",
+          "deps": { "name": "DatabaseA", "type": "other" }
+        },
+        { "name": "ExternalA", "type": "service" },
+        { "name": "InternalA", "type": "service" },
+        { "name": "LibraryA", "type": "library", "version": "1.0" }
+      ]
+    }
+  ]
 }
 ```
 
@@ -53,13 +54,7 @@ Gets consumed by a process reading over an entry DEPTHZ and integrated into the 
 - domain: A class of servers and services which encompass an entire service area
   - name (optional): Domain identifier
   - repos: List of git repositories to be walked over and consumed
-- servers: A node which represents a bare-metal or VM instance
-  - name: Server identifier
-- services: A service which runs, whether custom or off the shelf
-  - name: Service identifier
-  - dependencies: Additional services which this service is dependent on
-  - libraries: A custom or off the shelf code library
-    - name: Library name
-    - version (optional): The version of the library
-
-Note that `dependencies` is a unique field which can recurse.
+- deps: A list of dependencies under a domain, like a server or service
+  - name: Dependency identifier
+  - type: [domain, server, service, database, library, other]
+  - version (optional): Version identifier for dependency
