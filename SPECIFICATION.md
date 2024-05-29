@@ -9,18 +9,17 @@ everything into a singular output.
 
 ```
 {
-  "domain": {
-    "name": "DomainA",
-    "repos": [
-      "git@host:repoA.git",
-      "git@host:repoB.git",
-      "git@host:repoC.git"
-    ],
-    "deps": [
-      { "name": "Grafana", "type": "service" },
-      { "name": "Loki", "type": "service" }
-    ]
-  }
+  "name": "DomainA",
+  "type": "domain",
+  "repos": [
+    "git@host:repoA.git",
+    "git@host:repoB.git",
+    "git@host:repoC.git"
+  ],
+  "elements": [
+    { "name": "Grafana", "type": "service" },
+    { "name": "Loki", "type": "service" }
+  ]
 }
 ```
 
@@ -31,14 +30,15 @@ Gets consumed by a process reading over an entry DEPTHZ and integrated into the 
 
 ```
 {
-  "deps": [
-    { "name": "ServerA", "type": "server" },  
+  "name": "ServerA",
+  "type": "server",  
+  "elements": [
     { "name": "AppA",
       "type": "service",
-      "deps": [
+      "elements": [
         { "name": "PosgresA",
           "type": "database",
-          "deps": { "name": "DatabaseA", "type": "other" }
+          "elements": [{ "name": "DatabaseA", "type": "other" }]
         },
         { "name": "ExternalA", "type": "service" },
         { "name": "InternalA", "type": "service" },
