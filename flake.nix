@@ -20,6 +20,7 @@
           inherit system overlays;
         };
         libs = with pkgs; [
+          libgit2
         ];
       in
         with pkgs; {
@@ -32,6 +33,7 @@
                 {
                   extensions = ["rust-src" "rust-analyzer"];
                 })
+              openssl
               pkg-config
             ];
             shellHook = ''
