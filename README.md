@@ -10,37 +10,27 @@ A tool for analyzing git repos and correlating the depedencies between any relat
 Everything starts in a DEPTHZ file. See [Specification](./SPECIFICATION.md).
 
 - Domains (aka service areas)
-- App, system, server relationships
-- Library relationships
+- Library, database, service, server relationships (aka deps)
 
-## Example
+## Mermaid Example
 
 Creating a system dependency chart would be useful.
 
 ```
--- App Level
-AppA -> PostgresA -> DatabaseA
-     -> 3rd party external internet service
-     -> 3rd party internal vendor system
-     -> LibraryA
-AppB -> PostgresA -> DatabaseB
-     -> CacheA
-     -> LibraryA
-
--- Server Level
-ServerA -> NomadA -> AppA
-                  -> AppB
-ServerB -> NomadB -> AppA
-                  -> AppB
-
--- Domain Level
-DomainA -> ServerA
-        -> ServerB
+---
+title: Service Area
+---
+flowchart TB
+    DomainA --> ServerA
+    DomainA --> ServerB
+    ServerA --> NomadA
+         NomadA --> AppA & AppB
+    ServerB --> NomadB
+         NomadB --> AppA & AppB
+    AppA --> PostgresA --> DatabaseA
+    AppA --> ExternalA & InternalA & LibraryA
+    AppB --> PostgresA --> DatabaseB
+    AppB --> CacheA & LibraryA
 ```
 
-Note that 'PostgresA' is a shared service, so if it goes down both 'AppA' and 'AppB' are considered down.
-
-With the server level tracking, services could be distributed such as with the `NomadX` example.
-A nomad instance or app going down in this scenario doesn't always mean the entire service is down, just degraded.
-
-Tracking shared libraries would help build a dependency list for developers.
+![mermaid example](docs/mermaid-example.png)
