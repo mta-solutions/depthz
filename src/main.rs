@@ -1,13 +1,26 @@
+use clap::Parser;
 use git2::{Cred, RemoteCallbacks};
 use serde_json::Result;
 use std::env;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use self::parser::*;
 
 mod parser;
 
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+struct Cli {
+    // Optional override for ~/.ssh/id_rsa
+    #[arg(short, long)]
+    ssh_id: Option<String>,
+    depthz: String,
+}
+
 fn main() -> Result<()> {
+    let cli = Cli::parse();
+    println!("depthz: {}", cli.depthz);
+
     let data0 = r#"
         {
           "name": "DomainA",
