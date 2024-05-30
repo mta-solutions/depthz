@@ -12,9 +12,9 @@ everything into a singular output.
   "name": "DomainA",
   "type": "domain",
   "repos": [
-    "git@host:repoA.git",
-    "git@host:repoB.git",
-    "git@host:repoC.git"
+    { "url": "git@host:repoA.git", "name": "repoA" },
+    { "url": "git@host:repoB.git", "name": "repoB" },
+    { "url": "git@host:repoC.git", "name": "repoC" }
   ],
   "elements": [
     { "name": "Grafana", "type": "service" },

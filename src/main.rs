@@ -1,19 +1,19 @@
 use clap::Parser;
-use git2::{Cred, RemoteCallbacks};
 use serde_json::Result;
-use std::env;
-use std::path::{Path, PathBuf};
 
+use self::git::*;
 use self::parser::*;
 
-mod parser;
+pub mod git;
+pub mod parser;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    // Optional override for ~/.ssh/id_rsa
+    /// Override for ~/.ssh/id_rsa, e.g. id_ed25519
     #[arg(short, long)]
     ssh_id: Option<String>,
+
     depthz: String,
 }
 
@@ -26,9 +26,7 @@ fn main() -> Result<()> {
           "name": "DomainA",
           "type": "domain",
           "repos": [
-            "git@host:repoA.git",
-            "git@host:repoB.git",
-            "git@host:repoC.git"
+            { "url": "git@github.com:boj/nixos-config.git", "name": "nixos-config" }
           ],
           "elements": [
             { "name": "Grafana", "type": "service" },
@@ -39,6 +37,12 @@ fn main() -> Result<()> {
 
     let e: Element = serde_json::from_str(data0)?;
     println!("{:?}", e);
+
+    if let Some(repos) = e.repos {
+        for repo in repos.iter() {
+            download_git(repo, cli.ssh_id.as_deref());
+        }
+    }
 
     let data1 = r#"
         {
@@ -63,31 +67,6 @@ fn main() -> Result<()> {
 
     let e: Element = serde_json::from_str(data1)?;
     println!("{:?}", e);
-
-    // Git
-
-    let mut callbacks = RemoteCallbacks::new();
-    callbacks.credentials(|_url, username_from_url, _allowed_types| {
-        Cred::ssh_key(
-            username_from_url.unwrap(),
-            None,
-            Path::new(&format!("{}/.ssh/id_ed25519", env::var("HOME").unwrap())),
-            None,
-        )
-    });
-
-    let mut fo = git2::FetchOptions::new();
-    fo.remote_callbacks(callbacks);
-
-    let mut builder = git2::build::RepoBuilder::new();
-    builder.fetch_options(fo);
-
-    builder
-        .clone(
-            "git@github.com:rust-lang/git2-rs.git",
-            Path::new("/tmp/git2-rs"),
-        )
-        .unwrap();
 
     Ok(())
 }
