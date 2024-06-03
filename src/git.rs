@@ -1,36 +1,27 @@
-use git2::{Cred, RemoteCallbacks};
-use std::env;
-use std::fs::remove_dir_all;
+use std::io::{self, Write};
 use std::path::Path;
+use std::process::Command;
 
 use crate::parser::Git;
 
-pub fn download_git(repo: &Git, id: Option<&str>) {
-    let path = match id {
-        Some(ssh) => ssh,
-        None => "id_rsa",
+pub fn download_git(repo: &Git) {
+    let out = &format!("/tmp/{}", repo.name);
+    let output = if Path::new(out).exists() {
+        Command::new("git")
+            .current_dir(out)
+            .arg("pull")
+            .output()
+            .expect("failed to update repo")
+    } else {
+        Command::new("git")
+            .arg("clone")
+            .arg(repo.url.clone())
+            .arg(out)
+            .output()
+            .expect("failed to clone repo")
     };
 
-    let mut callbacks = RemoteCallbacks::new();
-    callbacks.credentials(|_url, username_from_url, _allowed_types| {
-        Cred::ssh_key(
-            username_from_url.unwrap(),
-            None,
-            Path::new(&format!("{}/.ssh/{}", env::var("HOME").unwrap(), path)),
-            None,
-        )
-    });
-
-    let mut fo = git2::FetchOptions::new();
-    fo.remote_callbacks(callbacks);
-
-    let mut builder = git2::build::RepoBuilder::new();
-    builder.fetch_options(fo);
-
-    let out = &format!("/tmp/{}", repo.name);
-    // Lazy: Delete path then clone again
-    if Path::new(out).exists() {
-        remove_dir_all(out).unwrap();
-    }
-    builder.clone(repo.url.as_str(), Path::new(out)).unwrap();
+    println!("status - {}: {}", repo.url, output.status);
+    io::stdout().write_all(&output.stdout).unwrap();
+    io::stderr().write_all(&output.stderr).unwrap();
 }

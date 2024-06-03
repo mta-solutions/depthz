@@ -10,10 +10,6 @@ pub mod parser;
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// Override for ~/.ssh/id_rsa, e.g. id_ed25519
-    #[arg(short, long)]
-    ssh_id: Option<String>,
-
     depthz: String,
 }
 
@@ -26,7 +22,14 @@ fn main() -> Result<()> {
           "name": "DomainA",
           "type": "domain",
           "repos": [
-            { "url": "git@github.com:boj/nixos-config.git", "name": "nixos-config" }
+            { "url": "git@github.com:mta-solutions/depthz.git",
+        	  "name": "depthz",
+        	  "path": "/test/repo/a"
+        	},
+            { "url": "git@github.com:mta-solutions/depthz.git",
+        	  "name": "depthz",
+        	  "path": "/test/repo/b"
+        	}
           ],
           "elements": [
             { "name": "Grafana", "type": "service" },
@@ -40,7 +43,7 @@ fn main() -> Result<()> {
 
     if let Some(repos) = e.repos {
         for repo in repos.iter() {
-            download_git(repo, cli.ssh_id.as_deref());
+            download_git(repo);
         }
     }
 
