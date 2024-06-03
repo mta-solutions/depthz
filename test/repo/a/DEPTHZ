@@ -1,18 +1,18 @@
 {
-  "name": "DomainA",
-  "type": "domain",
-  "repos": [
-    { "url": "git@github.com:mta-solutions/depthz.git",
-	  "name": "depthz",
-	  "path": "/test/repo/a"
-	},
-    { "url": "git@github.com:mta-solutions/depthz.git",
-	  "name": "depthz",
-	  "path": "/test/repo/b"
-	}
-  ],
+  "name": "ServerA",
+  "type": "server",  
   "elements": [
-    { "name": "Grafana", "type": "service" },
-    { "name": "Loki", "type": "service" }
+    { "name": "AppA",
+      "type": "service",
+      "elements": [
+        { "name": "PosgresA",
+          "type": "database",
+          "elements": [{ "name": "DatabaseA", "type": "other" }]
+        },
+        { "name": "ExternalA", "type": "service" },
+        { "name": "InternalA", "type": "service" },
+        { "name": "LibraryA", "type": "library", "version": "1.0" }
+      ]
+    }
   ]
 }

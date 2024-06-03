@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Result;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum Type {
     Domain,
@@ -11,7 +12,17 @@ pub enum Type {
     Other,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Git {
+    // Git URL
+    pub url: String,
+    // Name to clone repo to
+    pub name: String,
+    // Optional path, useful for monorepos
+    pub path: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Element {
     // Name of element
     pub name: String,
@@ -26,12 +37,10 @@ pub struct Element {
     pub elements: Option<Vec<Element>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Git {
-    // Git URL
-    pub url: String,
-    // Name to clone repo to
-    pub name: String,
-    // Optional path, useful for monorepos
-    pub path: Option<String>,
+impl Element {
+    // Parse a full JSON structure into an Element
+    pub fn parse(&self) -> Result<()> {
+        Ok(())
+    }
+    pub fn process(&self) {}
 }

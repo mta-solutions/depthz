@@ -1,0 +1,14 @@
+{
+  "name": "DomainA",
+  "type": "domain",
+  "repos": [
+    { "url": "git@github.com:mta-solutions/depthz.git",
+	  "name": "depthz",
+	  "path": "/test/repo/a"
+	}
+  ],
+  "elements": [
+    { "name": "Grafana", "type": "service" },
+    { "name": "Loki", "type": "service" }
+  ]
+}

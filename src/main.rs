@@ -1,5 +1,6 @@
 use clap::Parser;
 use serde_json::Result;
+use std::fs;
 
 use self::git::*;
 use self::parser::*;
@@ -15,61 +16,34 @@ struct Cli {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    println!("depthz: {}", cli.depthz);
 
-    let data0 = r#"
-        {
-          "name": "DomainA",
-          "type": "domain",
-          "repos": [
-            { "url": "git@github.com:mta-solutions/depthz.git",
-        	  "name": "depthz",
-        	  "path": "/test/repo/a"
-        	},
-            { "url": "git@github.com:mta-solutions/depthz.git",
-        	  "name": "depthz",
-        	  "path": "/test/repo/b"
-        	}
-          ],
-          "elements": [
-            { "name": "Grafana", "type": "service" },
-            { "name": "Loki", "type": "service" }
-          ]
-        }
-    "#;
+    let mut depthz: Vec<Element> = vec![];
 
-    let e: Element = serde_json::from_str(data0)?;
-    println!("{:?}", e);
+    // Read initial DEPTHZ
+    let data0 = fs::read_to_string(cli.depthz).expect("DEPTHZ file was unreadable");
+    let e: Element = serde_json::from_str(data0.as_str())?;
 
-    if let Some(repos) = e.repos {
+    // Loop over any git repos it may contain and clone/update them
+    if let Some(repos) = e.repos.clone() {
         for repo in repos.iter() {
             download_git(repo);
+            // Read the DEPTHZ files defined for this repo
+            let out: String = if let Some(path) = repo.path.clone() {
+                // Read from defined path
+                format!("/tmp/{}{}", repo.name, path)
+            } else {
+                // Assume top of repo
+                format!("/tmp/{}/DEPTHZ", repo.name)
+            };
+            println!("path: {}", out);
+            let data = fs::read_to_string(out).expect("DEPTHZ file was unreadable");
+            let e: Element = serde_json::from_str(data.as_str())?;
+            depthz.push(e);
         }
     }
+    depthz.push(e);
 
-    let data1 = r#"
-        {
-          "name": "ServerA",
-          "type": "server",  
-          "elements": [
-            { "name": "AppA",
-              "type": "service",
-              "elements": [
-                { "name": "PosgresA",
-                  "type": "database",
-                  "elements": [{ "name": "DatabaseA", "type": "other" }]
-                },
-                { "name": "ExternalA", "type": "service" },
-                { "name": "InternalA", "type": "service" },
-                { "name": "LibraryA", "type": "library", "version": "1.0" }
-              ]
-            }
-          ]
-        }
-    "#;
-
-    let e: Element = serde_json::from_str(data1)?;
-    println!("{:?}", e);
+    println!("{:?}", depthz);
 
     Ok(())
 }
