@@ -30,12 +30,11 @@ fn main() -> Result<()> {
             // Read the DEPTHZ files defined for this repo
             let out: String = if let Some(path) = repo.path.clone() {
                 // Read from defined path
-                format!("/tmp/{}{}", repo.name, path)
+                format!("/tmp/{}{}/DEPTHZ", repo.name, path)
             } else {
                 // Assume top of repo
                 format!("/tmp/{}/DEPTHZ", repo.name)
             };
-            println!("path: {}", out);
             let data = fs::read_to_string(out).expect("DEPTHZ file was unreadable");
             let e: Element = serde_json::from_str(data.as_str())?;
             depthz.push(e);
