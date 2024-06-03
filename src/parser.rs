@@ -1,12 +1,23 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "lowercase")]
+pub enum Type {
+    Domain,
+    Server,
+    Service,
+    Database,
+    Library,
+    Other,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Element {
     // Name of element
     pub name: String,
     // Type of element [domain|server|service|database|library|other]
     #[serde(rename = "type")]
-    pub d_type: String,
+    pub d_type: Type,
     // Repos to allocate
     pub repos: Option<Vec<Git>>,
     // Version to attach to resource, usually a library
