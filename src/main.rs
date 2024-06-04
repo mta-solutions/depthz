@@ -3,6 +3,7 @@ use clap::Parser;
 use self::git::download_git;
 use self::parser::*;
 
+pub mod builder;
 pub mod git;
 pub mod parser;
 
@@ -24,22 +25,21 @@ pub struct Cli {
 
 fn main() {
     let cli = Cli::parse();
-    let mut depthz: Vec<Element> = vec![];
 
     // If a git_url and name are provided, download the intitial repo
     // Otherwise path will point to a local DEPTHZ to start from
-    if let (Some(url), Some(name)) = (cli.git_url, cli.name) {
+    let element = if let (Some(url), Some(name)) = (cli.git_url, cli.name) {
         download_git(&Git {
             url: url.clone(),
             name: name.clone(),
             path: Some(cli.path.clone()),
         });
         let path = format!("/tmp/{}{}/DEPTHZ", name.clone(), cli.path);
-        parser::parse_json(path, &mut depthz).unwrap();
+        parser::parse_json(path).unwrap()
     } else {
         // Read and process starting from initial DEPTHZ
-        parser::parse_json(cli.path, &mut depthz).unwrap();
-    }
+        parser::parse_json(cli.path).unwrap()
+    };
 
-    println!("{:?}", depthz);
+    println!("{:#?}", element);
 }

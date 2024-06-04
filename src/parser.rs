@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
+use serde_json::Error;
 use std::fs;
 
 use crate::git::*;
@@ -40,9 +40,9 @@ pub struct Element {
     pub elements: Option<Vec<Element>>,
 }
 
-pub fn parse_json(dfile: String, depthz: &mut Vec<Element>) -> Result<()> {
+pub fn parse_json(dfile: String) -> Result<Element, Error> {
     let data0 = fs::read_to_string(dfile).expect("DEPTHZ file was unreadable");
-    let e: Element = serde_json::from_str(data0.as_str())?;
+    let mut e: Element = serde_json::from_str(data0.as_str())?;
 
     // Loop over any git repos it may contain and clone/update them
     if let Some(repos) = e.repos.clone() {
@@ -57,10 +57,13 @@ pub fn parse_json(dfile: String, depthz: &mut Vec<Element>) -> Result<()> {
                 format!("/tmp/{}/DEPTHZ", repo.name)
             };
             // Recurse through the rest of the structure
-            parse_json(out, depthz).unwrap();
+            let ie = parse_json(out).unwrap();
+            match e.elements.as_mut() {
+                Some(v) => v.push(ie),
+                None => e.elements = Some(vec![ie]),
+            }
         }
     }
 
-    depthz.push(e);
-    Ok(())
+    Ok(e)
 }
