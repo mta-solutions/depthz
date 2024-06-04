@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
+use std::fs;
+
+use crate::git::*;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -37,10 +40,27 @@ pub struct Element {
     pub elements: Option<Vec<Element>>,
 }
 
-impl Element {
-    // Parse a full JSON structure into an Element
-    pub fn parse(&self) -> Result<()> {
-        Ok(())
+pub fn parse_json(dfile: String, depthz: &mut Vec<Element>) -> Result<()> {
+    let data0 = fs::read_to_string(dfile).expect("DEPTHZ file was unreadable");
+    let e: Element = serde_json::from_str(data0.as_str())?;
+
+    // Loop over any git repos it may contain and clone/update them
+    if let Some(repos) = e.repos.clone() {
+        for repo in repos.iter() {
+            download_git(repo);
+            // Read the DEPTHZ files defined for this repo
+            let out: String = if let Some(path) = repo.path.clone() {
+                // Read from defined path
+                format!("/tmp/{}{}/DEPTHZ", repo.name, path)
+            } else {
+                // Assume top of repo
+                format!("/tmp/{}/DEPTHZ", repo.name)
+            };
+            // Recurse through the rest of the structure
+            parse_json(out, depthz).unwrap();
+        }
     }
-    pub fn process(&self) {}
+
+    depthz.push(e);
+    Ok(())
 }
