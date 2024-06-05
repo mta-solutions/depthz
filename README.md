@@ -9,8 +9,21 @@ A tool for analyzing git repos and correlating the depedencies between any relat
 
 Everything starts in a DEPTHZ file. See [Specification](./SPECIFICATION.md).
 
-- Domains (aka service areas)
-- Library, database, service, server relationships (aka deps)
+## Development
+
+### Dependencies
+
+- `git` - The binary calls out to a git subprocess to execute cloning/pulling
+
+Note: Using git from the cli  was a much simpler approach than trying to embed and use the `git2` library.
+
+### Nix
+
+This command will pull in any necessary deps if using nix:
+
+```
+nix develop
+```
 
 ## Mermaid Example
 
