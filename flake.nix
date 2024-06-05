@@ -20,7 +20,6 @@
           inherit system overlays;
         };
         libs = with pkgs; [
-          libgit2
         ];
       in
         with pkgs; {
@@ -29,11 +28,11 @@
             ];
             nativeBuildInputs = [
               gcc
+              git
               (rust-bin.stable.latest.default.override
                 {
                   extensions = ["rust-src" "rust-analyzer"];
                 })
-              openssl
               pkg-config
             ];
             shellHook = ''
