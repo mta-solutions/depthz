@@ -14,7 +14,7 @@ everything into a singular output.
   "repos": [
     { "url": "git@host:repoA.git", "name": "repoA" },
     { "url": "git@host:repoB.git", "name": "repoB" },
-    { "url": "git@host:repoC.git", "name": "repoC" }
+    { "url": "git@host:repoC.git", "name": "repoC", "path": "/path/to/depthz/file" }
   ],
   "elements": [
     { "name": "Grafana", "type": "service" },
@@ -25,6 +25,8 @@ everything into a singular output.
 
 Stored inside each individual git repository are more DEPTHZ files. Declares any dependencies in its chain.
 Gets consumed by a process reading over an entry DEPTHZ and integrated into the aggregate output.
+
+These could also declare more sub-dependencies using `repos`.
 
 ### Example
 
@@ -51,10 +53,7 @@ Gets consumed by a process reading over an entry DEPTHZ and integrated into the 
 
 ## Keywords
 
-- domain: A class of servers and services which encompass an entire service area
-  - name (optional): Domain identifier
-  - repos: List of git repositories to be walked over and consumed
-- deps: A list of dependencies under a domain, like a server or service
-  - name: Dependency identifier
-  - type: [domain, server, service, database, library, other]
-  - version (optional): Version identifier for dependency
+- name: Dependency identifier
+- type: [domain, server, service, database, library, other]
+- version (optional): Version identifier for dependency
+- elements: A nested list of dependencies under an element of `type`
