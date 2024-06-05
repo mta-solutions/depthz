@@ -1,5 +1,7 @@
 use clap::Parser;
 
+use crate::builder::build_mermaid;
+
 use self::git::download_git;
 use self::parser::*;
 
@@ -28,18 +30,22 @@ fn main() {
 
     // If a git_url and name are provided, download the intitial repo
     // Otherwise path will point to a local DEPTHZ to start from
-    let element = if let (Some(url), Some(name)) = (cli.git_url, cli.name) {
+    let path = if let (Some(url), Some(name)) = (cli.git_url, cli.name) {
         download_git(&Git {
             url: url.clone(),
             name: name.clone(),
             path: Some(cli.path.clone()),
         });
-        let path = format!("/tmp/{}{}/DEPTHZ", name.clone(), cli.path);
-        parser::parse_json(path).unwrap()
+        format!("/tmp/{}{}/DEPTHZ", name.clone(), cli.path)
     } else {
         // Read and process starting from initial DEPTHZ
-        parser::parse_json(cli.path).unwrap()
+        cli.path
     };
 
+    let element = parser::parse_json(path).unwrap();
     println!("{:#?}", element);
+
+    let mut out = String::from("flowchart TB\n");
+    build_mermaid(&mut out, element);
+    println!("{}", out);
 }
