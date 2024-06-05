@@ -15,7 +15,7 @@ Everything starts in a DEPTHZ file. See [Specification](./SPECIFICATION.md).
 
 - `git` - The binary calls out to a git subprocess to execute cloning/pulling
 
-Note: Using git from the cli  was a much simpler approach than trying to embed and use the `git2` library.
+Note: Using git from the cli was a much simpler approach than trying to embed and use the `git2` library.
 
 ### Nix
 
@@ -25,25 +25,65 @@ This command will pull in any necessary deps if using nix:
 nix develop
 ```
 
-## Mermaid Example
+## Usage
 
-Creating a system dependency chart would be useful.
+Build an entry point DEPTHZ. This can reside locally, or put in its own repo.
+To handle monorepo-like setups, or placing DEPTHZ elsewhere besides the root,
+an optional `path` parameter can be set.
 
 ```
----
-title: Service Area
----
+{
+  "name": "DomainA",
+  "type": "domain",
+  "repos": [
+    { "url": "git@host:repoA.git", "name": "repoA" },
+    { "url": "git@host:repoB.git", "name": "repoB", "path": "/path/to/depthz/dir" }
+  ]
+}
+```
+
+Build any dependent DEPTHZ files and put them in their relevant repos.
+
+```
+{
+  "name": "ServerA",
+  "type": "server",  
+  "elements": [
+    { "name": "AppA",
+      "type": "service"
+    }
+  ]
+}
+```
+
+Then run the `depthz` command to generate a mermaid output.
+
+```
+# read locally
+depthz -p DEPTHZ
+
+# read out of a git repo with a nested DEPTHZ
+depthz -g git@github.com:myrepo.git -n myrepo -p /my/DEPTHZ
+
+# output to a file
+depthz -p DEPTHZ -f output.mmd
+```
+
+## Mermaid Output
+
+```
 flowchart TB
+    DomainA --> Grafana
+    DomainA --> Loki
     DomainA --> ServerA
-    DomainA --> ServerB
-    ServerA --> NomadA
-         NomadA --> AppA & AppB
-    ServerB --> NomadB
-         NomadB --> AppA & AppB
-    AppA --> PostgresA --> DatabaseA
-    AppA --> ExternalA & InternalA & LibraryA
-    AppB --> PostgresA --> DatabaseB
-    AppB --> CacheA & LibraryA
+    ServerA --> AppA
+    AppA --> PosgresA
+    PosgresA --> DatabaseA
+    AppA --> ExternalA
+    AppA --> InternalA
+    AppA -->|1.0|LibraryA
 ```
+
+## Mermaid Flow Chart
 
 ![mermaid example](docs/mermaid-example.png)
