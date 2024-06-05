@@ -43,7 +43,7 @@ fn main() {
     };
 
     let element = parser::parse_json(path).unwrap();
-    println!("{:#?}", element);
+    println!("{:?}", element);
 
     let mut out = String::from("flowchart TB\n");
     build_mermaid(&mut out, element);
