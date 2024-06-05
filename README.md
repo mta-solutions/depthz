@@ -68,6 +68,7 @@ depthz -g git@github.com:myrepo.git -n myrepo -p /my/DEPTHZ
 # output to a file
 depthz -p DEPTHZ -f output.mmd
 ```
+Note that DEPTHZ files can be read independently to render their sub-set of the graph.
 
 ## Mermaid Output
 
