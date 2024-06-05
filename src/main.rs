@@ -23,9 +23,13 @@ pub struct Cli {
     /// Name to give repo if git_url is set
     #[arg(short, long)]
     pub name: Option<String>,
+
+    /// Optional file to write output to instead of stdout
+    #[arg(short, long)]
+    pub file: Option<String>,
 }
 
-fn main() {
+fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
 
     // If a git_url and name are provided, download the intitial repo
@@ -43,9 +47,18 @@ fn main() {
     };
 
     let element = parser::parse_json(path).unwrap();
-    println!("{:?}", element);
 
     let mut out = String::from("flowchart TB\n");
     build_mermaid(&mut out, element);
-    println!("{}", out);
+
+    match cli.file {
+        Some(f) => {
+            std::fs::write(f, out)?;
+            Ok(())
+        }
+        None => {
+            println!("{}", out);
+            Ok(())
+        }
+    }
 }
