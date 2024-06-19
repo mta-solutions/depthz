@@ -24,6 +24,11 @@ This command will pull in any necessary deps if using nix:
 ```
 nix develop
 ```
+## Format
+
+DEPTHZ files can be declared as JSON, YAML, or TOML.
+
+From the CLI, or in the `repo` sections, the `DEPTHZ` filename can be overridden.
 
 ## Usage
 
@@ -31,7 +36,7 @@ Build an entry point DEPTHZ. This can reside locally, or put in its own repo.
 To handle monorepo-like setups, or placing DEPTHZ elsewhere besides the root,
 an optional `path` parameter can be set.
 
-```
+```json
 {
   "name": "DomainA",
   "type": "domain",
@@ -44,7 +49,7 @@ an optional `path` parameter can be set.
 
 Build any dependent DEPTHZ files and put them in their relevant repos.
 
-```
+```json
 {
   "name": "ServerA",
   "type": "server",  
@@ -58,7 +63,7 @@ Build any dependent DEPTHZ files and put them in their relevant repos.
 
 Then run the `depthz` command to generate a mermaid output.
 
-```
+```bash
 # read locally
 depthz -p DEPTHZ
 
