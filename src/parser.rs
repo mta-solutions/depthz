@@ -23,6 +23,8 @@ pub struct Git {
     pub name: String,
     // Optional path, useful for monorepos
     pub path: Option<String>,
+    // Optional DEPTHZ file name
+    pub depthz: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -40,24 +42,39 @@ pub struct Element {
     pub elements: Option<Vec<Element>>,
 }
 
-pub fn parse_json(dfile: String) -> Result<Element, Error> {
-    let data0 = fs::read_to_string(dfile).expect("DEPTHZ file was unreadable");
-    let mut e: Element = serde_json::from_str(data0.as_str())?;
+pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
+    let f = format!("{}/{}", path, depthz);
+    let data0 = fs::read_to_string(f).expect("DEPTHZ file was unreadable");
+    let mut e: Element = {
+        let j = serde_json::from_str::<Element>(data0.as_str());
+        let y = serde_yaml::from_str::<Element>(data0.as_str());
+        let t = toml::from_str::<Element>(data0.as_str());
+        if j.is_ok() {
+            j.unwrap()
+        } else if y.is_ok() {
+            y.unwrap()
+        } else if t.is_ok() {
+            t.unwrap()
+        } else {
+            panic!("invalid DEPTHZ format. must be JSON, YAML, or TOML")
+        }
+    };
 
     // Loop over any git repos it may contain and clone/update them
     if let Some(repos) = e.repos.clone() {
         for repo in repos.iter() {
             download_git(repo);
             // Read the DEPTHZ files defined for this repo
-            let out: String = if let Some(path) = repo.path.clone() {
+            let out: String = if let Some(rpath) = repo.path.clone() {
                 // Read from defined path
-                format!("/tmp/{}{}/DEPTHZ", repo.name, path)
+                format!("/tmp/{}{}", repo.name, rpath)
             } else {
                 // Assume top of repo
-                format!("/tmp/{}/DEPTHZ", repo.name)
+                format!("/tmp/{}", repo.name)
             };
+            let dz = repo.depthz.clone().unwrap_or(depthz.clone());
             // Recurse through the rest of the structure
-            let ie = parse_json(out).unwrap();
+            let ie = parse(out, dz).unwrap();
             match e.elements.as_mut() {
                 Some(v) => v.push(ie),
                 None => e.elements = Some(vec![ie]),

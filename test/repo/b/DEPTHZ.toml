@@ -1,0 +1,13 @@
+[name]
+ServerB
+
+[type]
+server
+
+[[elements]]
+name: ExternalA
+type: service
+
+[[elements]]
+name: InternalA
+type: service

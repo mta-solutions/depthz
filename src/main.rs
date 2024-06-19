@@ -13,8 +13,12 @@ pub mod parser;
 #[command(version, about, long_about = None)]
 pub struct Cli {
     /// Path to DEPTHZ file
-    #[arg(short, long)]
+    #[arg(short, long, default_value = ".")]
     pub path: String,
+
+    /// DEPTHZ file name
+    #[arg(short, long, default_value = "DEPTHZ")]
+    pub depthz: String,
 
     /// Optional git repo to download
     #[arg(short, long)]
@@ -39,14 +43,15 @@ fn main() -> std::io::Result<()> {
             url: url.clone(),
             name: name.clone(),
             path: Some(cli.path.clone()),
+            depthz: Some(cli.depthz.clone()),
         });
-        format!("/tmp/{}{}/DEPTHZ", name.clone(), cli.path)
+        format!("/tmp/{}{}/{}", name.clone(), cli.path, cli.depthz)
     } else {
         // Read and process starting from initial DEPTHZ
         cli.path
     };
 
-    let element = parser::parse_json(path).unwrap();
+    let element = parser::parse(path, cli.depthz).unwrap();
 
     let mut out = String::from("flowchart TB\n");
     build_mermaid(&mut out, element);
