@@ -36,13 +36,39 @@ Build an entry point DEPTHZ. This can reside locally, or put in its own repo.
 To handle monorepo-like setups, or placing DEPTHZ elsewhere besides the root,
 an optional `path` parameter can be set.
 
+**YAML**
+
+```yaml
+name: DomainA
+type: domain
+repos:
+  - url: git@github.com:mta-solutions/depthz.git
+    name: depthz
+    path: /test/repo/a
+    depthz: DEPTHZ
+  - url: git@github.com:mta-solutions/depthz.git
+    name: depthz
+    path: /test/repo/b
+    depthz: DEPTHZ.toml
+```
+
+**JSON**
+
 ```json
 {
   "name": "DomainA",
   "type": "domain",
   "repos": [
-    { "url": "git@host:repoA.git", "name": "repoA" },
-    { "url": "git@host:repoB.git", "name": "repoB", "path": "/path/to/depthz/dir" }
+    { "url": "git@github.com:mta-solutions/depthz.git",
+	    "name": "depthz",
+	    "path": "/test/repo/a",
+      "depthz": "DEPTHZ"
+	  },
+    { "url": "git@github.com:mta-solutions/depthz.git",
+	    "name": "depthz",
+	    "path": "/test/repo/b",
+      "depthz": "DEPTHZ.toml"
+	  }
   ]
 }
 ```
