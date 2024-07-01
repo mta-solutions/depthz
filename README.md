@@ -7,7 +7,7 @@ A tool for analyzing git repos and correlating the depedencies between any relat
 
 ## Track Dependencies
 
-Everything starts in a DEPTHZ file. See [Specification](./SPECIFICATION.md).
+Everything starts in a DEPTHZ file.
 
 ## Development
 
@@ -60,13 +60,13 @@ repos:
   "type": "domain",
   "repos": [
     { "url": "git@github.com:mta-solutions/depthz.git",
-	    "name": "depthz",
-	    "path": "/test/repo/a",
+      "name": "depthz",
+      "path": "/test/repo/a",
       "depthz": "DEPTHZ"
 	  },
     { "url": "git@github.com:mta-solutions/depthz.git",
-	    "name": "depthz",
-	    "path": "/test/repo/b",
+      "name": "depthz",
+      "path": "/test/repo/b",
       "depthz": "DEPTHZ.toml"
 	  }
   ]
