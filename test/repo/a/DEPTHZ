@@ -11,7 +11,8 @@
         },
         { "name": "ExternalA", "type": "service" },
         { "name": "InternalA", "type": "service" },
-        { "name": "LibraryA", "type": "library", "version": "1.0" }
+        { "name": "LoggerA", "type": "other", "note": "prometheus", "version": "prod" },
+        { "name": "LibraryA", "type": "library", "version": "v1.0" }
       ]
     }
   ]

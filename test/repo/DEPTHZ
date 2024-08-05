@@ -5,6 +5,11 @@
     { "url": "git@github.com:mta-solutions/depthz.git",
 	  "name": "depthz",
 	  "path": "/test/repo/a"
+	},
+    { "url": "git@github.com:mta-solutions/depthz.git",
+	  "name": "depthz",
+	  "path": "/test/repo/b",
+      "depthz": "DEPTHZ.toml"
 	}
   ],
   "elements": [

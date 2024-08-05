@@ -38,6 +38,8 @@ pub struct Element {
     pub repos: Option<Vec<Git>>,
     // Version to attach to resource, usually a library
     pub version: Option<String>,
+    // Optional note to attach, for example: "logging"
+    pub note: Option<String>,
     // Additional related elements to associate
     pub elements: Option<Vec<Element>>,
 }
