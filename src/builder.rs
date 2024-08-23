@@ -11,7 +11,7 @@ pub fn build_mermaid(out: &mut String, e: Element) {
                     (None, None) => String::from(""),
                 };
                 let done = format!(
-                    "    {} -->{}{}\n",
+                    "    {}---{}{}\n",
                     e.name.clone(),
                     mid,
                     element.name.clone()
