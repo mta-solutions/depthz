@@ -46,7 +46,6 @@ pub struct Element {
 
 pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
     let f = format!("{}/{}", path, depthz);
-    println!("{:?}", f);
     let data0 = fs::read_to_string(f).expect("DEPTHZ file was unreadable");
     let mut e: Element = {
         let j = serde_json::from_str::<Element>(data0.as_str());
@@ -63,6 +62,8 @@ pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
         }
     };
 
+    let tmp = std::env::temp_dir();
+
     // Loop over any git repos it may contain and clone/update them
     if let Some(repos) = e.repos.clone() {
         for repo in repos.iter() {
@@ -70,10 +71,10 @@ pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
             // Read the DEPTHZ files defined for this repo
             let out: String = if let Some(rpath) = repo.path.clone() {
                 // Read from defined path
-                format!("/tmp/{}{}", repo.name, rpath)
+                format!("{}/{}/{}", tmp.display(), repo.name, rpath)
             } else {
                 // Assume top of repo
-                format!("/tmp/{}", repo.name)
+                format!("{}/{}", tmp.display(), repo.name)
             };
             let dz = repo.depthz.clone().unwrap_or(depthz.clone());
             // Recurse through the rest of the structure
