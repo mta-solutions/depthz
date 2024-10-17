@@ -5,8 +5,10 @@ use std::process::Command;
 use crate::parser::Git;
 
 pub fn download_git(repo: &Git) {
-    let out = &format!("/tmp/{}", repo.name);
-    let output = if Path::new(out).exists() {
+    // All relevant repos get stored in the OS's temp directory
+    let mut out = std::env::temp_dir();
+    out.push(repo.name.clone());
+    let output = if Path::new(out.as_path()).exists() {
         Command::new("git")
             .current_dir(out)
             .arg("pull")

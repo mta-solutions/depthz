@@ -46,6 +46,7 @@ pub struct Element {
 
 pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
     let f = format!("{}/{}", path, depthz);
+    println!("{:?}", f);
     let data0 = fs::read_to_string(f).expect("DEPTHZ file was unreadable");
     let mut e: Element = {
         let j = serde_json::from_str::<Element>(data0.as_str());

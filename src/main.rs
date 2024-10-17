@@ -38,20 +38,21 @@ fn main() -> std::io::Result<()> {
 
     // If a git_url and name are provided, download the intitial repo
     // Otherwise path will point to a local DEPTHZ to start from
-    let path = if let (Some(url), Some(name)) = (cli.git_url, cli.name) {
+    let root = if let (Some(url), Some(name)) = (cli.git_url, cli.name) {
         download_git(&Git {
             url: url.clone(),
             name: name.clone(),
             path: Some(cli.path.clone()),
             depthz: Some(cli.depthz.clone()),
         });
-        format!("/tmp/{}{}/{}", name.clone(), cli.path, cli.depthz)
+        let tmp = std::env::temp_dir();
+        format!("{}/{}/{}", tmp.display(), name.clone(), cli.path)
     } else {
         // Read and process starting from initial DEPTHZ
         cli.path
     };
 
-    let element = parser::parse(path, cli.depthz).unwrap();
+    let element = parser::parse(root, cli.depthz).unwrap();
 
     let mut out = String::from("flowchart TB\n");
     build_mermaid(&mut out, element);
