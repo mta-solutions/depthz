@@ -12,6 +12,7 @@ pub enum Type {
     Service,
     Database,
     Library,
+    Mobile,
     Other,
 }
 
