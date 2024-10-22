@@ -5,11 +5,11 @@ A tool for analyzing git repos and correlating the depedencies between any relat
 - Near-term goal: Export a textual graph of the systems and visualize it as a system map.
 - Long-term goal: Correlate the graph with actual systems and do realtime analysis.
 
-## Development
-
-### Dependencies
+## Dependencies
 
 - `git` - The binary calls out to a git subprocess to execute cloning/pulling
+
+## Development
 
 Note: Using git from the cli was a much simpler approach than trying to embed and use the `git2` library.
 
@@ -49,11 +49,19 @@ relevant sub-repo and place this DEPTHZ inside the higher level domain repo.
 From there it will clone and subsume the corresponding DEPTHZ files to build
 out the full picture of the domain.
 
+Optionally tag elements. If a filter is applied and an element doesn't match,
+both itself and all child elemnents get filtered out. This is potentially useful
+for determining loosely couple systems without a full overview, narrowing down
+the graph scope to a tagged department in the company, etc.
+
 **YAML**
 
 ```yaml
 name: DomainA
 type: domain
+tags:
+  - foo
+  - bar
 repos:
   - url: git@github.com:mta-solutions/depthz.git
     name: depthz
@@ -71,6 +79,7 @@ repos:
 {
   "name": "DomainA",
   "type": "domain",
+  "tags": [ "foo", "bar" ],
   "repos": [
     { "url": "git@github.com:mta-solutions/depthz.git",
       "name": "depthz",
@@ -141,6 +150,9 @@ depthz -p DEPTHZ -f output.mmd
 
 # override the default DEPTHZ name
 depthz -d DEPTHZ.toml
+
+# filter elements by tags
+depthz -t "foo,bar"
 ```
 
 ## Mermaid Output
