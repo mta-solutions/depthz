@@ -1,0 +1,8 @@
+name: MyApp
+type: service
+tags:
+  - "foo"
+  - "bar"
+elements:
+  - name: PostgreSQL
+    type: database

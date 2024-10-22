@@ -31,6 +31,17 @@ pub struct Cli {
     /// Optional file to write output to instead of stdout
     #[arg(short, long)]
     pub file: Option<String>,
+
+    /// Optional comma delimited list of tags to filter by
+    #[arg(short, long)]
+    pub tags: Option<String>,
+}
+
+fn parse_tags(tags: Option<String>) -> Option<Vec<String>> {
+    match tags {
+        Some(t) => Some(t.split(",").map(|s| String::from(s)).collect()),
+        None => None,
+    }
 }
 
 fn main() -> std::io::Result<()> {
@@ -55,7 +66,8 @@ fn main() -> std::io::Result<()> {
     let element = parser::parse(root, cli.depthz).unwrap();
 
     let mut out = String::from("flowchart TB\n");
-    build_mermaid(&mut out, element);
+    let filter = parse_tags(cli.tags);
+    build_mermaid(&mut out, element, &filter);
 
     match cli.file {
         Some(f) => {

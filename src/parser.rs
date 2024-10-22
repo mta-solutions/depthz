@@ -42,6 +42,8 @@ pub struct Element {
     pub note: Option<String>,
     // Additional related elements to associate
     pub elements: Option<Vec<Element>>,
+    // Optional arbitrary tags
+    pub tags: Option<Vec<String>>,
 }
 
 pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
