@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Error;
 use std::fs;
-
-use crate::git::*;
+use std::io::{self, Write};
+use std::path::Path;
+use std::process::Command;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -26,6 +27,40 @@ pub struct Git {
     pub path: Option<String>,
     // Optional DEPTHZ file name
     pub depthz: Option<String>,
+}
+
+impl Git {
+    pub fn download_git(&self) -> String {
+        // All relevant repos get stored in the OS's temp directory
+        let mut out = std::env::temp_dir();
+        out.push(self.name.clone());
+        let output = if Path::new(out.as_path()).exists() {
+            Command::new("git")
+                .current_dir(out.clone())
+                .arg("pull")
+                .output()
+                .expect("failed to update repo")
+        } else {
+            Command::new("git")
+                .arg("clone")
+                .arg(self.url.clone())
+                .arg(out.clone())
+                .output()
+                .expect("failed to clone repo")
+        };
+
+        println!("status - {}: {}", self.url, output.status);
+        io::stdout().write_all(&output.stdout).unwrap();
+        io::stderr().write_all(&output.stderr).unwrap();
+
+        let date = Command::new("git")
+            .current_dir(out)
+            .args(["log", "-n 1", "--pretty=format:%cI"])
+            .output()
+            .expect("failed to get last date from repo");
+
+        return String::from_utf8(date.stdout).unwrap();
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -70,7 +105,8 @@ pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
     // Loop over any git repos it may contain and clone/update them
     if let Some(repos) = e.repos.clone() {
         for repo in repos.iter() {
-            download_git(repo);
+            let date = repo.download_git();
+            println!("repo date: {}", date);
             // Read the DEPTHZ files defined for this repo
             let out: String = if let Some(rpath) = repo.path.clone() {
                 // Read from defined path

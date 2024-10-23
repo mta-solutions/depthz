@@ -2,11 +2,9 @@ use clap::Parser;
 
 use crate::builder::build_mermaid;
 
-use self::git::download_git;
 use self::parser::*;
 
 pub mod builder;
-pub mod git;
 pub mod parser;
 
 #[derive(Parser)]
@@ -35,11 +33,19 @@ pub struct Cli {
     /// Optional comma delimited list of tags to filter by
     #[arg(short, long)]
     pub tags: Option<String>,
+
+    /// Optional green health cutoff in months
+    #[arg(short, long, default_value = "3")]
+    pub health_green: Option<i8>,
+
+    /// Optional red health cutoff in months
+    #[arg(short, long, default_value = "9")]
+    pub health_red: Option<i8>,
 }
 
 fn parse_tags(tags: Option<String>) -> Option<Vec<String>> {
     match tags {
-        Some(t) => Some(t.split(",").map(|s| String::from(s)).collect()),
+        Some(t) => Some(t.split(",").map(|s| String::from(s.trim())).collect()),
         None => None,
     }
 }
@@ -50,12 +56,13 @@ fn main() -> std::io::Result<()> {
     // If a git_url and name are provided, download the intitial repo
     // Otherwise path will point to a local DEPTHZ to start from
     let root = if let (Some(url), Some(name)) = (cli.git_url, cli.name) {
-        download_git(&Git {
+        let _ = Git {
             url: url.clone(),
             name: name.clone(),
             path: Some(cli.path.clone()),
             depthz: Some(cli.depthz.clone()),
-        });
+        }
+        .download_git();
         let tmp = std::env::temp_dir();
         format!("{}/{}/{}", tmp.display(), name.clone(), cli.path)
     } else {
