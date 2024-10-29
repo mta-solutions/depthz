@@ -35,11 +35,11 @@ pub struct Cli {
     pub tags: Option<String>,
 
     /// Optional green health cutoff in months
-    #[arg(short, long, default_value = "3")]
+    #[arg(long, default_value = "3")]
     pub health_green: Option<i8>,
 
     /// Optional red health cutoff in months
-    #[arg(short, long, default_value = "9")]
+    #[arg(long, default_value = "9")]
     pub health_red: Option<i8>,
 }
 

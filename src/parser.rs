@@ -80,6 +80,10 @@ pub struct Element {
     pub elements: Option<Vec<Element>>,
     // Optional arbitrary tags
     pub tags: Option<Vec<String>>,
+
+    // Internal field for tracking the last git commit date
+    // for the top level DEPTHZ project
+    git_date: Option<String>,
 }
 
 pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
@@ -106,7 +110,6 @@ pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
     if let Some(repos) = e.repos.clone() {
         for repo in repos.iter() {
             let date = repo.download_git();
-            println!("repo date: {}", date);
             // Read the DEPTHZ files defined for this repo
             let out: String = if let Some(rpath) = repo.path.clone() {
                 // Read from defined path
@@ -117,7 +120,8 @@ pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
             };
             let dz = repo.depthz.clone().unwrap_or(depthz.clone());
             // Recurse through the rest of the structure
-            let ie = parse(out, dz).unwrap();
+            let mut ie = parse(out, dz).unwrap();
+            ie.git_date = Some(date);
             match e.elements.as_mut() {
                 Some(v) => v.push(ie),
                 None => e.elements = Some(vec![ie]),
