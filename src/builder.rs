@@ -37,7 +37,9 @@ pub fn build_mermaid(out: &mut String, e: Element, f: &Option<Vec<String>>) {
                     (None, Some(n)) => format!("|'{}'|", n),
                     (None, None) => String::from(""),
                 };
-                let done = format!("    {}---{}{}\n", e.name.clone(), mid, element.name.clone());
+                let left: String = e.name.split_whitespace().collect();
+                let right: String = element.name.split_whitespace().collect();
+                let done = format!("    {}---{}{}\n", left, mid, right);
                 out.push_str(done.as_str());
                 build_mermaid(out, element.clone(), f)
             }
