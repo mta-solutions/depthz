@@ -5,7 +5,7 @@ use std::io::{self, Write};
 use std::path::Path;
 use std::process::Command;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Type {
     Domain,
@@ -67,7 +67,7 @@ impl Git {
 pub struct Element {
     // Name of element
     pub name: String,
-    // Type of element [domain|server|service|database|library|other]
+    // Type of element [domain|server|service|database|library|mobile|other]
     #[serde(rename = "type")]
     pub d_type: Type,
     // Repos to allocate

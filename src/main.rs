@@ -76,6 +76,15 @@ fn main() -> std::io::Result<()> {
     let filter = parse_tags(cli.tags);
     build_mermaid(&mut out, element, &filter);
 
+    // Push color class data last
+    // let color_data = r#"
+    //     classDef service stroke:blue
+    //     classDef database stroke:yellow
+    //     classDef library stroke:black
+    //     classDef mobile stroke:white
+    // "#;
+    // out.push_str(color_data);
+
     match cli.file {
         Some(f) => {
             std::fs::write(f, out)?;

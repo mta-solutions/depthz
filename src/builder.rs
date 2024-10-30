@@ -1,4 +1,4 @@
-use crate::parser::Element;
+use crate::parser::{Element, Type};
 
 fn match_filter(t: &Option<Vec<String>>, f: &Option<Vec<String>>) -> bool {
     match (t, f) {
@@ -28,24 +28,69 @@ pub fn build_mermaid(out: &mut String, e: Element, f: &Option<Vec<String>>) {
     if !match_filter(&e.tags, &f) {
         return;
     };
+
+    // Group systems by their domain
+    let mut domain = false;
+    if e.d_type == Type::Domain {
+        domain = true;
+        let str = format!("    subgraph {}_Domain\n", e.name.clone());
+        out.push_str(str.as_str());
+    }
+
     match e.elements {
         Some(elements) => {
             for element in elements.iter() {
+                // Group systems by their domain
+                // Versions
                 let mid = match (element.version.clone(), element.note.clone()) {
                     (Some(v), Some(n)) => format!("|'{}' {}|", n, v),
                     (Some(v), None) => format!("|{}|", v),
                     (None, Some(n)) => format!("|'{}'|", n),
                     (None, None) => String::from(""),
                 };
+
+                // Output
                 let left: String = e.name.split_whitespace().collect();
                 let right: String = element.name.split_whitespace().collect();
-                let done = format!("    {}---{}{}\n", left, mid, right);
-                out.push_str(done.as_str());
-                build_mermaid(out, element.clone(), f)
+                let res = format!("    {}---{}{}\n", left, mid, right);
+
+                let class_ref = format!("class {}", right);
+                match element.d_type {
+                    Type::Server => {
+                        let class = format!("{} {}\n", class_ref, "server");
+                        out.push_str(class.as_str());
+                    }
+                    Type::Service => {
+                        let class = format!("{} {}\n", class_ref, "service");
+                        out.push_str(class.as_str());
+                    }
+                    Type::Database => {
+                        let class = format!("{} {}\n", class_ref, "database");
+                        out.push_str(class.as_str());
+                    }
+                    Type::Library => {
+                        let class = format!("{} {}\n", class_ref, "library");
+                        out.push_str(class.as_str());
+                    }
+                    Type::Mobile => {
+                        let class = format!("{} {}\n", class_ref, "mobile");
+                        out.push_str(class.as_str());
+                    }
+                    _ => {}
+                }
+
+                out.push_str(res.as_str());
+
+                // Continue to recurse
+                build_mermaid(out, element.clone(), f);
             }
         }
         // Leaf node
         None => {}
+    }
+
+    if domain {
+        out.push_str("    end\n");
     }
 }
 
