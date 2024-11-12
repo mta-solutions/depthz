@@ -1,6 +1,6 @@
 use clap::Parser;
 
-use crate::builder::build_mermaid;
+use crate::builder::*;
 
 use self::parser::*;
 
@@ -41,6 +41,10 @@ pub struct Cli {
     /// Optional red health cutoff in months
     #[arg(long, default_value = "9")]
     pub health_red: Option<i8>,
+
+    /// Optional render engine: mermaid, ???
+    #[arg(short, long, default_value = "mermaid")]
+    pub renderer: Option<String>,
 }
 
 fn parse_tags(tags: Option<String>) -> Option<Vec<String>> {
@@ -72,18 +76,25 @@ fn main() -> std::io::Result<()> {
 
     let element = parser::parse(root, cli.depthz).unwrap();
 
-    let mut out = String::from("flowchart TB\n");
-    let filter = parse_tags(cli.tags);
-    build_mermaid(&mut out, element, &filter);
+    // Final output
+    let mut out: String;
 
-    // Push color class data last
-    // let color_data = r#"
-    //     classDef service stroke:blue
-    //     classDef database stroke:yellow
-    //     classDef library stroke:black
-    //     classDef mobile stroke:white
-    // "#;
-    // out.push_str(color_data);
+    // Check which render to use. mermaid.js is default
+    match cli.renderer {
+        _ => {
+            out = String::from("flowchart TB\n");
+            let filter = parse_tags(cli.tags);
+            Mermaid.build(&mut out, element, &filter);
+            // Push color class data last
+            // let color_data = r#"
+            //     classDef service stroke:blue
+            //     classDef database stroke:yellow
+            //     classDef library stroke:black
+            //     classDef mobile stroke:white
+            // "#;
+            // out.push_str(color_data);
+        }
+    }
 
     match cli.file {
         Some(f) => {
