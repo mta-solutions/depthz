@@ -5,19 +5,32 @@ use std::io::{self, Write};
 use std::path::Path;
 use std::process::Command;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Type {
+    // A domain is the highest level concept all products and
+    // infrastructure are contained within
+    //
+    // A business can have multiple software domains. For example,
+    // the Software Engineering domain vs. the Corporate IT domain
     Domain,
-    Server,
-    Service,
-    Database,
+    // Represents the business's understanding of a software suite
+    Product,
+    // Represents an independent software platform, typically the
+    // kind that sits between other systems
+    Platform,
+    // Represents individual elements of a product or platform
+    Component,
+    // Represents individual systems that are not directly part
+    // of a product or platform, but are required to support them
+    Infrastructure,
+    // Useful for tracking internal library usage
     Library,
-    Mobile,
+    // A miscellaneous type for things not matching the above
     Other,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Git {
     // Git URL
     pub url: String,
@@ -63,7 +76,7 @@ impl Git {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Element {
     // Name of element
     pub name: String,

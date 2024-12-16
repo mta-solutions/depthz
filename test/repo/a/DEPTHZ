@@ -1,16 +1,16 @@
 {
-  "name": "ServerA",
-  "type": "server",  
+  "name": "Server A",
+  "type": "infrastructure",  
   "elements": [
     { "name": "AppA",
-      "type": "service",
+      "type": "component",
       "elements": [
         { "name": "PosgresA",
-          "type": "database",
+          "type": "other",
           "elements": [{ "name": "DatabaseA", "type": "other" }]
         },
-        { "name": "ExternalA", "type": "service" },
-        { "name": "InternalA", "type": "service" },
+        { "name": "ExternalA", "type": "component" },
+        { "name": "InternalA", "type": "component" },
         { "name": "LoggerA", "type": "other", "note": "prometheus", "version": "prod" },
         { "name": "LibraryA", "type": "library", "version": "v1.0" }
       ]

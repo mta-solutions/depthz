@@ -11,6 +11,6 @@ repos:
     depthz: DEPTHZ.toml
 elements:
   - name: Grafana
-    type: service
+    type: infrastructure
   - name: Loki
-    type: service
+    type: infrastructure

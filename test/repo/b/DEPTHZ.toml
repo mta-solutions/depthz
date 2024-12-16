@@ -1,10 +1,10 @@
 name = "ServerB"
-type = "server"
+type = "infrastructure"
 
 [[elements]]
 name = "ExternalA"
-type = "service"
+type = "component"
 
 [[elements]]
 name = "InternalA"
-type = "service"
+type = "component"
