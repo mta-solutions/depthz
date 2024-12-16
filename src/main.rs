@@ -100,6 +100,7 @@ fn main() -> std::io::Result<()> {
                 &filter,
             );
 
+            name_assoc.dedup();
             for nae in name_assoc.iter() {
                 out.push_str(nae.as_str());
             }
@@ -119,6 +120,8 @@ fn main() -> std::io::Result<()> {
 
 "#;
             out.push_str(color_data);
+
+            class_list.dedup();
             for cle in class_list.iter() {
                 out.push_str(cle.as_str());
             }

@@ -80,7 +80,7 @@ impl Git {
 pub struct Element {
     // Name of element
     pub name: String,
-    // Type of element [domain|server|service|database|library|mobile|other]
+    // Type of element
     #[serde(rename = "type")]
     pub d_type: Type,
     // Repos to allocate
@@ -113,6 +113,9 @@ pub fn parse(path: String, depthz: String) -> Result<Element, Error> {
         } else if t.is_ok() {
             t.unwrap()
         } else {
+            let _ = j.inspect_err(|e| eprintln!("JSON error: {e}"));
+            let _ = y.inspect_err(|e| eprintln!("YAML error: {e}"));
+            let _ = t.inspect_err(|e| eprintln!("TOML error: {e}"));
             panic!("invalid DEPTHZ format. must be JSON, YAML, or TOML")
         }
     };
