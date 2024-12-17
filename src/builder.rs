@@ -58,13 +58,6 @@ impl Builder for Mermaid {
             node_rels.push(str);
         }
 
-        // Parent element string type
-        let p_e_type = serde_json::to_string(&e.d_type)
-            .unwrap()
-            .trim_end_matches('"')
-            .trim_start_matches('"')
-            .to_string();
-
         match e.elements {
             Some(elements) => {
                 for element in elements.iter() {
@@ -85,7 +78,7 @@ impl Builder for Mermaid {
 
                     // Output
                     let l_name: String = e.name.split_whitespace().collect();
-                    let left: String = format!("{}_{}", l_name, p_e_type);
+                    let left: String = format!("{}_{:?}", l_name, e.d_type);
                     let r_name: String = element.name.split_whitespace().collect();
                     let right: String = format!("{}_{}", r_name, e_type);
                     let res = format!("    {}---{}{}\n", left, mid, right);
