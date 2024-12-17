@@ -58,6 +58,13 @@ impl Builder for Mermaid {
             node_rels.push(str);
         }
 
+        // Parent element string type
+        let p_e_type = serde_json::to_string(&e.d_type)
+            .unwrap()
+            .trim_end_matches('"')
+            .trim_start_matches('"')
+            .to_string();
+
         match e.elements {
             Some(elements) => {
                 for element in elements.iter() {
@@ -69,24 +76,25 @@ impl Builder for Mermaid {
                         (None, None) => String::from(""),
                     };
 
+                    // Element string type
+                    let e_type = serde_json::to_string(&element.d_type)
+                        .unwrap()
+                        .trim_end_matches('"')
+                        .trim_start_matches('"')
+                        .to_string();
+
                     // Output
-                    let left: String = e.name.split_whitespace().collect();
-                    let right: String = element.name.split_whitespace().collect();
+                    let l_name: String = e.name.split_whitespace().collect();
+                    let left: String = format!("{}_{}", l_name, p_e_type);
+                    let r_name: String = element.name.split_whitespace().collect();
+                    let right: String = format!("{}_{}", r_name, e_type);
                     let res = format!("    {}---{}{}\n", left, mid, right);
                     node_rels.push(res);
 
-                    let name_data = format!("    {}[{}]\n", left, e.name.clone());
+                    let name_data = format!("    {}[{}]\n", right, element.name.clone());
                     name_assoc.push(name_data);
 
-                    let e_type = serde_json::to_string(&element.d_type).unwrap();
-                    let class_data = format!(
-                        "    class {} {}\n",
-                        right,
-                        e_type
-                            .trim_end_matches('"')
-                            .trim_start_matches('"')
-                            .to_string()
-                    );
+                    let class_data = format!("    class {} {}\n", right, e_type);
                     class_list.push(class_data);
 
                     // Continue to recurse
