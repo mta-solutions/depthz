@@ -54,7 +54,12 @@ impl Builder for Mermaid {
         let mut domain = false;
         if e.d_type == Type::Domain {
             domain = true;
-            let str = format!("    subgraph {}_Domain\n", e.name.clone());
+            let d_type_u = serde_json::to_value(&e.d_type).unwrap();
+            let d_type = d_type_u.as_str().unwrap();
+            let d_name: String = e.name.split_whitespace().collect();
+            let name_data = format!("    {}_{}[{}]\n", d_name, d_type, e.name.clone());
+            name_assoc.push(name_data);
+            let str = format!("    subgraph {}_Domain\n", d_name);
             node_rels.push(str);
         }
 
