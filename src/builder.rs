@@ -69,25 +69,24 @@ impl Builder for Mermaid {
                         (None, None) => String::from(""),
                     };
 
-                    // Element string type
-                    let e_type = serde_json::to_string(&element.d_type)
-                        .unwrap()
-                        .trim_end_matches('"')
-                        .trim_start_matches('"')
-                        .to_string();
+                    let e_type_u = serde_json::to_value(&e.d_type).unwrap();
+                    let e_type = e_type_u.as_str().unwrap();
+
+                    let p_e_type_u = serde_json::to_value(&element.d_type).unwrap();
+                    let p_e_type = p_e_type_u.as_str().unwrap();
 
                     // Output
                     let l_name: String = e.name.split_whitespace().collect();
-                    let left: String = format!("{}_{:?}", l_name, e.d_type);
+                    let left: String = format!("{}_{}", l_name, e_type);
                     let r_name: String = element.name.split_whitespace().collect();
-                    let right: String = format!("{}_{}", r_name, e_type);
+                    let right: String = format!("{}_{}", r_name, p_e_type);
                     let res = format!("    {}---{}{}\n", left, mid, right);
                     node_rels.push(res);
 
                     let name_data = format!("    {}[{}]\n", right, element.name.clone());
                     name_assoc.push(name_data);
 
-                    let class_data = format!("    class {} {}\n", right, e_type);
+                    let class_data = format!("    class {} {}\n", right, p_e_type);
                     class_list.push(class_data);
 
                     // Continue to recurse
